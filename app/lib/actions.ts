@@ -68,6 +68,7 @@ const FormSchema = z.object({
   }
 
   export async function deleteInvoice(id: string) {
+    
     try {
       await sql`DELETE FROM invoices WHERE id = ${id}`;
       revalidatePath('/dashboard/invoices');
