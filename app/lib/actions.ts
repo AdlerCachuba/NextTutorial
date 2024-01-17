@@ -28,8 +28,8 @@ export async function authenticate(
 
 const FormSchema = z.object({
   id: z.string(),
-  customerId: z.string({
-    invalid_type_error: 'Please select a customer.',
+  name: z.string({
+    invalid_type_error: 'Por favor escreva o nome do cliente.',
   }),
   amount: z.coerce
     .number()
@@ -45,7 +45,7 @@ const FormSchema = z.object({
  
   export type State = {
     errors?: {
-      customerId?: string[];
+      name?: string[];
       amount?: string[];
       status?: string[];
     };
@@ -55,7 +55,7 @@ const FormSchema = z.object({
   export async function createInvoice(prevState: State, formData: FormData) {
     // Validate form using Zod
     const validatedFields = CreateInvoice.safeParse({
-      customerId: formData.get('customerId'),
+      name: formData.get('name'),
       amount: formData.get('amount'),
       status: formData.get('status'),
     });
@@ -69,7 +69,7 @@ const FormSchema = z.object({
     }
    
     // Prepare data for insertion into the database
-    const { customerId, amount, status } = validatedFields.data;
+    const { name, amount, status } = validatedFields.data;
     const amountInCents = amount * 100;
     const date = new Date().toISOString().split('T')[0];
    
@@ -77,7 +77,7 @@ const FormSchema = z.object({
     try {
       await sql`
         INSERT INTO invoices (customer_id, amount, status, date)
-        VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
+        VALUES (${name}, ${amountInCents}, ${status}, ${date})
       `;
     } catch (error) {
       // If a database error occurs, return a more specific error.
@@ -109,13 +109,13 @@ const FormSchema = z.object({
       };
     }
    
-    const { customerId, amount, status } = validatedFields.data;
+    const { name, amount, status } = validatedFields.data;
     const amountInCents = amount * 100;
    
     try {
       await sql`
         UPDATE invoices
-        SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
+        SET customer_id = ${name}, amount = ${amountInCents}, status = ${status}
         WHERE id = ${id}
       `;
     } catch (error) {
